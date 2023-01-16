@@ -28,14 +28,18 @@ class CrimeDetailViewModel(crimeId: UUID) : ViewModel() {
 
     fun updateCrime(onUpdate: (crime: Crime) -> Crime) {
         _crime.update { oldCrime ->
-            oldCrime?.let { onUpdate(it) }
+            oldCrime?.let {
+                // We are using this let here as a null check of oldCrime
+                // this will work even if we removed the let operator
+                // but then app will crash if oldCrime is null
+                onUpdate(it)
+            }
         }
     }
 
     override fun onCleared() {
         super.onCleared()
         crime.value?.let {
-
             crimeRepository.updateCrime(it)
         }
     }

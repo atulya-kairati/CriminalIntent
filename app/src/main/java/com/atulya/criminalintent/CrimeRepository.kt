@@ -27,6 +27,9 @@ class CrimeRepository private constructor(
     suspend fun getCrime(id: UUID) = database.crimeDao().getCrime(id)
 
     fun updateCrime(crime: Crime) {
+        // Updation needs to happen in GlobalScope
+        // so we can be sure that data was saved
+        // and the was not cancelled
         coroutineScope.launch {
             database.crimeDao().updateCrime(crime)
         }
