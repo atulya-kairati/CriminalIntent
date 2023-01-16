@@ -1,6 +1,5 @@
 package com.atulya.criminalintent.fragments
 
-import android.R
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -10,6 +9,7 @@ import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -21,6 +21,7 @@ import com.atulya.criminalintent.databinding.FragmentCrimeDetailBinding
 import com.atulya.criminalintent.models.CrimeDetailViewModel
 import com.atulya.criminalintent.models.CrimeDetailViewModelFactory
 import kotlinx.coroutines.launch
+import java.util.*
 
 class CrimeDetailFragment : Fragment() {
 
@@ -48,8 +49,7 @@ class CrimeDetailFragment : Fragment() {
 
             if (binding.crimeTitle.text.isBlank()) {
                 Toast.makeText(context, "Title can't be empty", Toast.LENGTH_SHORT).show()
-            }
-            else{
+            } else {
                 findNavController().popBackStack()
             }
         }
@@ -103,6 +103,13 @@ class CrimeDetailFragment : Fragment() {
             }
         }
 
+        setFragmentResultListener(DatePickerFragment.DATE_REQUEST_KEY) { requestKey, bundle ->
+            val date = bundle.getSerializable(DatePickerFragment.DATE_BUNDLE_KEY) as Date
+            Log.d(TAG, "onViewCreated: $date")
+            crimeDetailViewModel.updateCrime {
+                it.copy(date = date)
+            }
+        }
     }
 
     override fun onDestroyView() {
@@ -122,7 +129,7 @@ class CrimeDetailFragment : Fragment() {
             // We are setting listening here because
             // this is the only place where we have
             // access to the latest crime
-            crimeDate.setOnClickListener{
+            crimeDate.setOnClickListener {
                 findNavController().navigate(
                     CrimeDetailFragmentDirections.selectDate(crime.date)
                 )
