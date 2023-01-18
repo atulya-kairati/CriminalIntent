@@ -27,4 +27,6 @@ class CrimeListViewModel : ViewModel() {
             }
         }
     }
+
+    suspend fun addNewCrime(crime: Crime) = crimeRepository.addCrime(crime)
 }

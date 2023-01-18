@@ -21,7 +21,7 @@ class DatePickerFragment : DialogFragment() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         
-        val dateListner = DatePickerDialog.OnDateSetListener { datePicker, year, month, day ->
+        val dateListener = DatePickerDialog.OnDateSetListener { datePicker, year, month, day ->
 
             val  resultDate = GregorianCalendar(year, month, day).time
 
@@ -39,7 +39,7 @@ class DatePickerFragment : DialogFragment() {
         Log.d(TAG, "onCreateDialog: ${args.currentDate}")
         return DatePickerDialog(
             requireContext(),
-            dateListner,
+            dateListener,
             year,
             month,
             day

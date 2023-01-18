@@ -20,7 +20,9 @@ class CrimeRepository private constructor(
         context.applicationContext,
         CrimeDatabase::class.java,
         DB_NAME
-    ).createFromAsset(DB_NAME).build()
+    )
+//        .createFromAsset(DB_NAME)
+        .build()
 
     fun getCrimes() = database.crimeDao().getCrimes()
 
@@ -34,6 +36,8 @@ class CrimeRepository private constructor(
             database.crimeDao().updateCrime(crime)
         }
     }
+
+    suspend fun addCrime(crime: Crime) = database.crimeDao().addCrime(crime)
 
     companion object {
         private var INSTANCE: CrimeRepository? = null

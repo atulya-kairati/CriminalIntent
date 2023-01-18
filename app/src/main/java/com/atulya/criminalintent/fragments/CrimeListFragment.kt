@@ -1,9 +1,10 @@
 package com.atulya.criminalintent.fragments
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.util.Log
+import android.view.*
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -12,13 +13,16 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.atulya.criminalintent.R
+import com.atulya.criminalintent.data.Crime
 import com.atulya.criminalintent.databinding.FragmentCrimeListBinding
 import com.atulya.criminalintent.models.CrimeListViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.util.*
 
-private const val TAG = "CrimeListFragment"
+private const val TAG = ">>> CrimeListFragment"
 
-class CrimeListFragment : Fragment() {
+class CrimeListFragment : Fragment(), MenuProvider {
 
     private val crimeListViewModel: CrimeListViewModel by viewModels()
 
@@ -29,12 +33,15 @@ class CrimeListFragment : Fragment() {
             "binding is null. Check if the view is visible"
         }
 
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+
+        val menuHost: MenuHost = requireActivity()
+        menuHost.addMenuProvider(this, viewLifecycleOwner, Lifecycle.State.RESUMED)
+
         _binding = FragmentCrimeListBinding.inflate(layoutInflater, container, false)
 
         binding.crimeRecyclerView.layoutManager = LinearLayoutManager(context)
@@ -65,6 +72,8 @@ class CrimeListFragment : Fragment() {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
 
                 crimeListViewModel.crimes.collect { crimes ->
+
+                    Log.d(TAG, "onViewCreated: $crimes")
                     
                     val adapter = CrimeListAdapter(crimes){ crimeId ->
                         findNavController().navigate(
@@ -75,6 +84,7 @@ class CrimeListFragment : Fragment() {
                 }
 
             }
+
         }
     }
 
@@ -91,5 +101,41 @@ class CrimeListFragment : Fragment() {
          */
         _binding = null
         super.onDestroyView()
+    }
+
+    override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+        menuInflater.inflate(R.menu.fragment_crime_list, menu)
+    }
+
+    override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+        Log.d(TAG, "onMenuItemSelected: ${menuItem.itemId}")
+        Log.d(TAG, "onMenuItemSelected: ${R.menu.fragment_crime_list}")
+
+        return when(menuItem.itemId){
+            R.id.new_crime -> {
+                Log.d(TAG, "onMenuItemSelected: ${menuItem.itemId}")
+                showNewCrime()
+                true
+            }
+
+            else -> false
+        }
+    }
+
+    private fun showNewCrime() {
+        val newCrime = Crime(
+            id = UUID.randomUUID(),
+            title = "",
+            date = Date(),
+            isSolved = false
+        )
+
+        viewLifecycleOwner.lifecycleScope.launch{
+            crimeListViewModel.addNewCrime(newCrime)
+
+            findNavController().navigate(
+                CrimeListFragmentDirections.showCrimeDetail(newCrime.id)
+            )
+        }
     }
 }

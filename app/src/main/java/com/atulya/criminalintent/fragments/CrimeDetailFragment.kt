@@ -53,8 +53,6 @@ class CrimeDetailFragment : Fragment() {
                 findNavController().popBackStack()
             }
         }
-
-
     }
 
 
