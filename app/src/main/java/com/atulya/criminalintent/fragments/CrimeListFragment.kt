@@ -1,5 +1,6 @@
 package com.atulya.criminalintent.fragments
 
+import android.opengl.Visibility
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -73,8 +74,15 @@ class CrimeListFragment : Fragment(), MenuProvider {
 
                 crimeListViewModel.crimes.collect { crimes ->
 
-                    Log.d(TAG, "onViewCreated: $crimes")
-                    
+                    Log.d(TAG, "onViewCreated: ${crimes.isEmpty()}")
+                    /**
+                     * When the crimes is empty then we can show a msg
+                     * that recycler view is empty
+                     */
+                    if(crimes.isEmpty()){
+                        binding.msgText.visibility = View.VISIBLE
+                    }
+
                     val adapter = CrimeListAdapter(crimes){ crimeId ->
                         findNavController().navigate(
                             CrimeListFragmentDirections.showCrimeDetail(crimeId)
