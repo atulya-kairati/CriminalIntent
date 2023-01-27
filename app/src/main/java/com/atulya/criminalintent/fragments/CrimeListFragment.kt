@@ -82,6 +82,9 @@ class CrimeListFragment : Fragment(), MenuProvider {
                     if(crimes.isEmpty()){
                         binding.msgText.visibility = View.VISIBLE
                     }
+                    else {
+                        binding.msgText.visibility = View.INVISIBLE
+                    }
 
                     val adapter = CrimeListAdapter(crimes){ crimeId ->
                         findNavController().navigate(
