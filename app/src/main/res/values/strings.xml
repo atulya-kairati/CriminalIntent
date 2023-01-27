@@ -6,4 +6,6 @@
     <string name="crime_solved_label">Solved</string>
     <string name="new_crime">New Crime</string>
     <string name="no_crime">No crimes yet. Go commit some!</string>
+    <string name="choose_suspect">Choose Suspect</string>
+    <string name="send_crime_report">Send Crime Report</string>
 </resources>
