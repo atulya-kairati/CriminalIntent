@@ -16,7 +16,7 @@ class CrimeRepository private constructor(
     context: Context,
     private val coroutineScope: CoroutineScope = GlobalScope
 ) {
-
+    // constructor is private to prohibit other class from making an object
     private val database: CrimeDatabase = Room.databaseBuilder(
         context.applicationContext,
         CrimeDatabase::class.java,

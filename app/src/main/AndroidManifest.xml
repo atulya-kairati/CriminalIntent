@@ -27,5 +27,21 @@
         </activity>
     </application>
 
+    <!--
+    We provide disclosure in manifest stating the queries
+    that we will make through the app during the runtime.
+
+    This inconvenience has been placed for sake of user privacy
+
+    Here:
+    We declare that we want to check the presence of contact app
+    -->
+
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.PICK"/>
+            <data android:mimeType="vnd.android.cursor.dir/contact"/>
+        </intent>
+    </queries>
 
 </manifest>
