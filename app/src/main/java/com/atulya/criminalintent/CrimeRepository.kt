@@ -5,6 +5,7 @@ import androidx.room.Room
 import com.atulya.criminalintent.data.Crime
 import com.atulya.criminalintent.database.CrimeDatabase
 import com.atulya.criminalintent.database.migration_1_2
+import com.atulya.criminalintent.database.migration_2_3
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -22,7 +23,7 @@ class CrimeRepository private constructor(
         CrimeDatabase::class.java,
         DB_NAME
     )
-        .addMigrations(migration_1_2)
+        .addMigrations(migration_1_2, migration_2_3)
 //        .createFromAsset(DB_NAME)
         .build()
 
