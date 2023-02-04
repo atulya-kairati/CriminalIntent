@@ -14,6 +14,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.FileProvider
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResultListener
@@ -23,12 +24,14 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import coil.load
 import com.atulya.criminalintent.R
 import com.atulya.criminalintent.data.Crime
 import com.atulya.criminalintent.databinding.FragmentCrimeDetailBinding
 import com.atulya.criminalintent.models.CrimeDetailViewModel
 import com.atulya.criminalintent.models.CrimeDetailViewModelFactory
 import kotlinx.coroutines.launch
+import java.io.File
 import java.util.*
 
 
@@ -54,8 +57,20 @@ class CrimeDetailFragment : Fragment() {
         ActivityResultContracts.PickContact()
     ) { uri ->
         Log.d(TAG, "contact uri: $uri")
-        uri?.let {contactUri: Uri ->
+        uri?.let { contactUri: Uri ->
             parseContactSelection(contactUri)
+        }
+    }
+
+    private var photoName: String? = null
+    private val takePhoto = registerForActivityResult(
+        ActivityResultContracts.TakePicture()
+    ) { savedPhoto ->
+        if (savedPhoto && photoName != null) {
+            Log.d(TAG, "takePhoto: great success!")
+            crimeDetailViewModel.updateCrime {
+                it.copy(photoFileName = photoName)
+            }
         }
     }
 
@@ -66,10 +81,10 @@ class CrimeDetailFragment : Fragment() {
             .query(uri, queryField, null, null, null)
 
         queryCursor?.use { cursor ->
-            if(cursor.moveToFirst()){
+            if (cursor.moveToFirst()) {
                 val suspect = cursor.getString(0)
                 crimeDetailViewModel.updateCrime { oldCrime ->
-                    oldCrime.copy(suspect=suspect)
+                    oldCrime.copy(suspect = suspect)
                 }
             }
         }
@@ -121,10 +136,6 @@ class CrimeDetailFragment : Fragment() {
                 }
             }
 
-            crimeSuspect.setOnClickListener {
-                selectSuspect.launch(null)
-            }
-
             /**
              * creates intent for the contact app launch
              * then checks if the intent can be resolved
@@ -135,6 +146,43 @@ class CrimeDetailFragment : Fragment() {
             Log.d(TAG, "selectSuspectIntent: $selectSuspectIntent")
 
             crimeSuspect.isEnabled = canResolveIntent(selectSuspectIntent)
+
+            crimeSuspect.setOnClickListener {
+                selectSuspect.launch(null)
+            }
+
+
+            /**
+             * creates intent for the camera app launch
+             * then checks if the intent can be resolved
+             * Acc. enables/disables the takePhotoButton
+             *
+             * We pass a empty Uri since we are only testing
+             * if the intent is resolvable or not.
+             */
+            val takePhotoIntent = takePhoto.contract.createIntent(
+                requireContext(),
+                Uri.EMPTY
+            )
+            takePhotoButton.isEnabled = canResolveIntent(takePhotoIntent)
+
+            takePhotoButton.setOnClickListener {
+                photoName = "IMG_${Date()}.jpg"
+
+                // create a file
+                val photoFile = File(requireContext().applicationContext.filesDir, photoName)
+
+                // create file uri
+                val photoUri = FileProvider.getUriForFile(
+                    requireContext(),
+                    "com.atulya.criminalintent.fileprovider",
+                    photoFile
+                )
+                // launch camera app
+                takePhoto.launch(photoUri)
+            }
+
+
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
@@ -165,6 +213,7 @@ class CrimeDetailFragment : Fragment() {
     }
 
     private fun updateUi(crime: Crime) {
+        Log.d(TAG, "updateUi: $crime")
         binding.apply {
             crimeTitle.setText(crime.title)
             crimeTitle.setSelection(crimeTitle.text.length)
@@ -172,6 +221,11 @@ class CrimeDetailFragment : Fragment() {
             crimeDate.text = crime.date.toString()
 
             crimeSolved.isChecked = crime.isSolved
+
+            // TODO: Use Bitmap to scale the image to save memory
+            crime.photoFileName?.let {photoName->
+                crimePhoto.load(File(requireContext().filesDir, photoName))
+            }
 
             // We are setting listening here because
             // this is the only place where we have
@@ -225,7 +279,7 @@ class CrimeDetailFragment : Fragment() {
         )
     }
 
-    private fun canResolveIntent(intent: Intent): Boolean{
+    private fun canResolveIntent(intent: Intent): Boolean {
         /**
          * We have provided a disclosure in the manifest
          * And through [PackageManger] we can determine if the

@@ -83,4 +83,6 @@ dependencies {
     // Navigation Lib
     implementation "androidx.navigation:navigation-ui-ktx:2.5.3"  // Core
     implementation "androidx.navigation:navigation-fragment-ktx:2.5.3"  // for fragments
+
+    implementation 'io.coil-kt:coil:2.2.2'
 }
