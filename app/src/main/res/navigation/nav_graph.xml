@@ -27,6 +27,9 @@
         <action
             android:id="@+id/selectDate"
             app:destination="@id/datePickerFragment" />
+        <action
+            android:id="@+id/zoomImage"
+            app:destination="@id/bigImageDialogFragment" />
     </fragment>
     <dialog
         android:id="@+id/datePickerFragment"
@@ -35,5 +38,16 @@
         <argument
             android:name="currentDate"
             app:argType="java.util.Date" />
+    </dialog>
+    <dialog
+        android:id="@+id/bigImageDialogFragment"
+        android:name="com.atulya.criminalintent.fragments.BigImageDialogFragment"
+        android:label="BigImageDialogFragment"
+        tools:layout="@layout/fragment_big_image_dialog"
+
+        >
+        <argument
+            android:name="photoName"
+            app:argType="string" />
     </dialog>
 </navigation>

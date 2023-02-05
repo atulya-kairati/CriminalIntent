@@ -225,6 +225,11 @@ class CrimeDetailFragment : Fragment() {
             // TODO: Use Bitmap to scale the image to save memory
             crime.photoFileName?.let {photoName->
                 crimePhoto.load(File(requireContext().filesDir, photoName))
+                crimePhoto.setOnClickListener{
+                    findNavController().navigate(
+                        CrimeDetailFragmentDirections.zoomImage(photoName)
+                    )
+                }
             }
 
             // We are setting listening here because
@@ -282,7 +287,7 @@ class CrimeDetailFragment : Fragment() {
     private fun canResolveIntent(intent: Intent): Boolean {
         /**
          * We have provided a disclosure in the manifest
-         * And through [PackageManger] we can determine if the
+         * And through [PackageManager] we can determine if the
          * OS can resolve our intent or not.
          */
         val packageManager: PackageManager = requireActivity().packageManager
