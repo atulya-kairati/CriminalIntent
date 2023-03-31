@@ -72,7 +72,7 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.0'
 
-    // lifecycle (Apps work even when I remove this)
+    // lifecycle (Apps work even when I remove this) it is for [repeatOnLifecycle]
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.4.1'
 
     // room
